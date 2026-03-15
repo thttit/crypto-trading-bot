@@ -28,6 +28,7 @@
       --radius-sm: 12px;
       --max-w: 800px;
       --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -76,6 +77,18 @@
       0%, 100% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.65; transform: scale(0.92); }
     }
+    @keyframes fade-slide-in {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes shimmer {
+      0% { background-position: -120% 0; }
+      100% { background-position: 120% 0; }
+    }
+    @keyframes float-subtle {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-2px); }
+    }
 
     .section { margin-bottom: 2.75rem; }
     .section-label {
@@ -85,7 +98,11 @@
       letter-spacing: 0.12em;
       color: var(--accent);
       margin-bottom: 0.45rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
     }
+    .section-label .ico { opacity: 0.9; font-size: 0.85em; }
     .section-title {
       font-size: 1.22rem;
       font-weight: 700;
@@ -94,6 +111,7 @@
       margin-bottom: 0.9rem;
     }
 
+    /* ----- Hero with avatar ----- */
     .hero {
       display: flex;
       flex-wrap: wrap;
@@ -118,14 +136,19 @@
       font-size: 1.75rem;
       font-weight: 700;
       letter-spacing: -0.03em;
-      color: var(--text);
       margin-bottom: 0.35rem;
+      color: var(--text);
+      background: linear-gradient(135deg, #1a1a1a 0%, #3d3d3d 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
     .hero .title {
       font-size: 0.95rem;
       font-weight: 500;
       color: var(--accent);
       margin-bottom: 0.5rem;
+      transition: color 0.25s;
       display: flex;
       flex-wrap: wrap;
       gap: 0.3em;
@@ -148,8 +171,29 @@
     .hero .meta a:hover { color: var(--accent-dim); text-decoration: underline; }
     .hero .location::before { content: '📍 '; }
     .hero .email::before { content: '✉ '; }
+    .hero .hero-punch {
+      margin-top: 0.75rem;
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      max-width: 60ch;
+      line-height: 1.5;
+    }
+    .page-tagline {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      padding: 0.5rem 0;
+      opacity: 0;
+      animation: fade-slide-in 0.6s var(--ease-out) 0.15s forwards;
+    }
 
-    .featured-ai { margin-bottom: 2.25rem; }
+    /* ----- Featured AI card (top) ----- */
+    .featured-ai {
+      margin-bottom: 2.25rem;
+    }
     .featured-ai .section-label {
       display: inline-flex;
       align-items: center;
@@ -181,8 +225,9 @@
       box-shadow: 0 4px 20px var(--accent-glow);
     }
     .github-card-featured:hover {
-      box-shadow: 0 12px 40px rgba(13, 148, 136, 0.18);
-      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(13, 148, 136, 0.22);
+      transform: translateY(-4px);
+      border-color: var(--accent-dim);
     }
     .github-card-featured .icon-wrap {
       width: 48px;
@@ -221,7 +266,86 @@
       align-items: center;
       gap: 0.35rem;
     }
+    .featured-detail {
+      margin-top: 1.25rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border);
+    }
+    .featured-detail h4 {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+    .featured-detail .project-overview p,
+    .featured-detail .builder-workflow ul {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+      margin-bottom: 0.5rem;
+    }
+    .featured-detail .builder-workflow .flow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.95rem;
+      color: var(--accent);
+      font-weight: 500;
+      margin: 0.4rem 0 0.6rem;
+    }
+    .featured-detail .builder-workflow ul {
+      list-style: none;
+    }
+    .featured-detail .builder-workflow ul li {
+      padding-left: 1.2rem;
+      position: relative;
+      margin-bottom: 0.35rem;
+    }
+    .featured-detail .builder-workflow ul li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+    .featured-detail .project-tech-stack .stack-group {
+      margin-bottom: 0.85rem;
+    }
+    .featured-detail .project-tech-stack .stack-group:last-child { margin-bottom: 0; }
+    .featured-detail .project-tech-stack .stack-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.35rem;
+    }
+    .featured-detail .project-tech-stack .tech-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+    }
+    .featured-detail .project-tech-stack .tech-tag {
+      font-size: 0.76rem;
+      padding: 0.28rem 0.55rem;
+    }
+    .other-experiments-list {
+      list-style: none;
+      font-size: 0.92rem;
+      color: var(--text-muted);
+    }
+    .other-experiments-list li {
+      padding-left: 1.2rem;
+      position: relative;
+      margin-bottom: 0.4rem;
+    }
+    .other-experiments-list li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
 
+    /* ----- Nav ----- */
     .nav-anchors {
       display: flex;
       flex-wrap: wrap;
@@ -243,6 +367,7 @@
       color: var(--accent);
     }
 
+    /* ----- About ----- */
     .about p {
       font-size: 0.95rem;
       color: var(--text-muted);
@@ -251,6 +376,7 @@
     }
     .about p:last-child { margin-bottom: 0; }
 
+    /* ----- Tech Stack ----- */
     .tech-group { margin-bottom: 1.35rem; }
     .tech-group:last-child { margin-bottom: 0; }
     .tech-group-title {
@@ -283,17 +409,20 @@
     }
     .tech-tag.ai-tool:hover { border-color: var(--accent); color: var(--accent); }
 
+    /* ----- Cards ----- */
     .card {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 1.3rem 1.45rem;
       margin-bottom: 1rem;
-      transition: border-color 0.25s, box-shadow 0.25s;
+      transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s var(--ease-spring);
     }
     .card:hover {
-      border-color: var(--border-subtle);
-      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+      border-color: rgba(13, 148, 136, 0.2);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+      transform: translateY(-2px);
+      transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s var(--ease-spring);
     }
     .card h3 {
       font-size: 1.04rem;
@@ -339,11 +468,13 @@
       color: var(--text-dim);
     }
 
+    /* ----- Experience ----- */
     .exp-card .company { font-size: 0.9rem; color: var(--accent); font-weight: 600; margin-bottom: 0.2rem; }
     .exp-card .date { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 0.55rem; }
     .enterprise-card .modules { font-size: 0.82rem; color: var(--text-dim); margin-top: 0.5rem; }
     .enterprise-card .modules span { margin-right: 0.5rem; }
 
+    /* ----- Workflow ----- */
     .workflow-box {
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -366,6 +497,7 @@
     .workflow-box .tools-inline { font-size: 0.88rem; color: var(--text-muted); margin-top: 0.7rem; }
     .workflow-box .tools-inline strong { color: var(--text); }
 
+    /* ----- Experiments ----- */
     .experiments { display: flex; flex-wrap: wrap; gap: 0.5rem; }
     .experiment-tag {
       display: inline-flex;
@@ -394,6 +526,7 @@
       animation: pulse-dot 1.8s ease-in-out infinite;
     }
 
+    /* ----- Enjoy ----- */
     .enjoy-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
     .enjoy-list span {
       font-size: 0.88rem;
@@ -406,6 +539,7 @@
     }
     .enjoy-list span:hover { border-color: var(--accent); color: var(--accent); }
 
+    /* ----- Contact ----- */
     .contact {
       margin-top: 2.25rem;
       padding-top: 1.75rem;
@@ -422,6 +556,8 @@
 </head>
 <body>
   <div class="page">
+    <p class="page-tagline">AI-first engineer building experimental products with AI-assisted development</p>
+    <!-- Hero with avatar -->
     <header class="hero reveal">
       <img src="./avatar.jpg" alt="Tran Hoang Thanh Thy" class="hero-avatar reveal" />
       <div class="hero-text">
@@ -435,22 +571,83 @@
         </p>
         <div class="meta reveal reveal-delay-2">
           <span class="location">Ho Chi Minh City, Vietnam</span>
-          <a class="email" href="mailto:tht.it1502@gmail.com">tht.it1502@gmail.com</a>
+          <a class="email" href="mailto:thtt.it1502@gmail.com">thtt.it1502@gmail.com</a>
         </div>
+        <p class="hero-punch reveal reveal-delay-2">I build experimental AI-powered products using tools like Cursor, Claude Code, and Antigravity, …and more.</p>
       </div>
     </header>
 
+    <!-- Featured: AI project card (top) -->
     <section class="featured-ai reveal">
-      <p class="section-label">Featured — AI Project</p>
+      <p class="section-label"><span class="ico">⭐</span> Featured — AI Project</p>
       <a href="https://github.com/thttit/crypto-trading-bot" target="_blank" rel="noopener noreferrer" class="github-card-featured" title="Open crypto-trading-bot on GitHub">
         <div class="icon-wrap" aria-hidden="true">🤖</div>
         <div class="body">
           <h3>crypto-trading-bot</h3>
-          <p class="repo-desc">Experimental AI-powered trading bot for Binance Futures. Real-time market data, signal analysis, automated execution. Built with Cursor AI & Node.js.</p>
+          <p class="repo-desc">Experimental AI-powered trading bot for Binance Futures.<br>Retrieves real-time market data, evaluates trading signals, and executes trades automatically.<br>Built using Cursor AI and Node.js.</p>
           <p class="repo-meta">Node.js · Binance API · Cursor AI · REST APIs</p>
           <span class="repo-link">View on GitHub →</span>
         </div>
       </a>
+
+      <div class="featured-detail reveal">
+        <div class="project-overview">
+          <h4>About this project</h4>
+          <p>This project is an experimental AI-assisted crypto trading bot.</p>
+          <p>It was built using AI-assisted development tools such as Cursor and Claude Code to rapidly prototype trading logic, API integrations, and automation workflows.</p>
+          <p>The system connects to crypto exchanges, retrieves market data, evaluates trading signals, and executes trades programmatically.</p>
+          <p>This project explores how AI-assisted development can accelerate the creation of real-world automation tools for financial markets.</p>
+        </div>
+        <div class="project-tech-stack" style="margin-top: 1.25rem;">
+          <h4>Tech Stack</h4>
+          <div class="stack-group">
+            <p class="stack-label">Frontend</p>
+            <div class="tech-tags">
+              <span class="tech-tag">Next.js</span>
+              <span class="tech-tag">React</span>
+              <span class="tech-tag">Tailwind CSS</span>
+            </div>
+          </div>
+          <div class="stack-group">
+            <p class="stack-label">Backend</p>
+            <div class="tech-tags">
+              <span class="tech-tag">Node.js</span>
+              <span class="tech-tag">REST APIs</span>
+            </div>
+          </div>
+          <div class="stack-group">
+            <p class="stack-label">Trading Integration</p>
+            <div class="tech-tags">
+              <span class="tech-tag">Binance API</span>
+            </div>
+          </div>
+          <div class="stack-group">
+            <p class="stack-label">AI Development</p>
+            <div class="tech-tags">
+              <span class="tech-tag ai-tool">Cursor IDE</span>
+              <span class="tech-tag ai-tool">Claude Code</span>
+              <span class="tech-tag ai-tool">Prompt Engineering</span>
+            </div>
+          </div>
+          <div class="stack-group">
+            <p class="stack-label">Deployment</p>
+            <div class="tech-tags">
+              <span class="tech-tag">Vercel</span>
+            </div>
+          </div>
+        </div>
+        <div class="builder-workflow" style="margin-top: 1.25rem;">
+          <h4>How I built this</h4>
+          <p class="flow">Idea → Prompt → Prototype → Ship</p>
+          <ul>
+            <li>Designed trading logic and system architecture</li>
+            <li>Used Cursor IDE to generate the initial implementation</li>
+            <li>Integrated Binance API for market data and order execution</li>
+            <li>Iterated on trading strategies and automation logic</li>
+            <li>Deployed prototype on Vercel</li>
+          </ul>
+        </div>
+      </div>
     </section>
 
     <nav class="nav-anchors reveal">
@@ -459,11 +656,12 @@
       <a href="#ai-projects">AI Projects</a>
       <a href="#experience">Experience</a>
       <a href="#workflow">Workflow</a>
+      <a href="#other-experiments">Other Experiments</a>
       <a href="#contact">Contact</a>
     </nav>
 
     <section id="about" class="section about reveal">
-      <p class="section-label">About Me</p>
+      <p class="section-label"><span class="ico">👋</span> About Me</p>
       <h2 class="section-title">About Me</h2>
       <p>Software engineer who enjoys building products and experimenting with AI tools.</p>
       <p>My background is in full-stack development with technologies such as React, Next.js, Node.js, NestJS, GraphQL, and microservices. Recently, I've been integrating AI-assisted development workflows into my daily work using tools like Cursor and Claude Code.</p>
@@ -472,7 +670,7 @@
     </section>
 
     <section id="tech" class="section reveal">
-      <p class="section-label">Skills</p>
+      <p class="section-label"><span class="ico">🛠</span> Skills</p>
       <h2 class="section-title">Tech Stack</h2>
       <div class="tech-group">
         <p class="tech-group-title">Languages</p>
@@ -540,12 +738,12 @@
     </section>
 
     <section id="ai-projects" class="section reveal">
-      <p class="section-label">Things I Built</p>
+      <p class="section-label"><span class="ico">🚀</span> Things I Built</p>
       <h2 class="section-title">AI Projects & Experiments</h2>
 
       <article class="card reveal">
         <h3>AI Crypto Trading Bot (Binance Futures)</h3>
-        <p class="one-liner">Built an experimental trading bot capable of executing automated futures trades on Binance. The system retrieves market data, evaluates trading signals, and executes trades programmatically.</p>
+        <p class="one-liner">Built an experimental trading bot capable of executing automated futures trades on Binance Futures. The system retrieves market data, evaluates trading signals, and executes trades programmatically.</p>
         <ul>
           <li>Real-time market data integration using Binance Futures API</li>
           <li>Automated trade execution</li>
@@ -559,7 +757,7 @@
 
       <article class="card reveal">
         <h3>AI Telegram Information Agents</h3>
-        <p class="one-liner">Developed AI-powered Telegram bots designed to deliver global news and crypto market updates directly in chat. The bots collect information from online sources and summarize it for users. I also designed distinct conversational personalities for the bots so they interact with users in a more natural way.</p>
+        <p class="one-liner">Developed AI-powered Telegram bots designed to deliver global news and crypto market updates directly in chat. The bots collect information from multiple online sources and summarize it for users. I also designed distinct conversational personalities for each bot so they interact with users in a more natural way.</p>
         <ul>
           <li>Automated news aggregation</li>
           <li>AI-generated summaries</li>
@@ -573,7 +771,7 @@
 
       <article class="card reveal">
         <h3>AI Content Generation Workflow</h3>
-        <p class="one-liner">Built an experimental pipeline for AI-generated content creation. This workflow uses generative AI tools to create characters and modify visual elements automatically.</p>
+        <p class="one-liner">Built an experimental pipeline for AI-generated content workflows. This workflow uses generative AI tools to create characters and modify visual elements automatically.</p>
         <ul>
           <li>AI-generated characters and scenes</li>
           <li>Automated visual transformation workflows</li>
@@ -586,7 +784,7 @@
 
       <article class="card reveal">
         <h3>AI Research & Automation Tools</h3>
-        <p class="one-liner">Built small AI-assisted tools combining web crawling and generative AI models. These tools automatically collect information and generate structured responses.</p>
+        <p class="one-liner">Built small AI-assisted tools combining web crawling techniques with generative AI models. These tools automatically collect information and generate structured responses.</p>
         <ul>
           <li>Research automation</li>
           <li>Information summarization</li>
@@ -599,19 +797,19 @@
     </section>
 
     <section id="experience" class="section reveal">
-      <p class="section-label">Career</p>
+      <p class="section-label"><span class="ico">💼</span> Career</p>
       <h2 class="section-title">Professional Experience</h2>
       <div class="card exp-card reveal">
         <h3>Software Developer</h3>
         <p class="company">Cyberlogitec Vietnam</p>
         <p class="date">Jan 2024 – Present</p>
-        <p class="one-liner">Working on enterprise manufacturing systems for Korean industrial companies. Develop full-stack applications supporting factory operations including MRP, MES, WMS, and logistics systems.</p>
+        <p class="one-liner">Working on enterprise manufacturing systems for Korean industrial companies. Develop full-stack applications supporting factory operations such as MRP, MES, WMS, and logistics systems.</p>
         <div class="tech">
           <span>React</span><span>Next.js</span><span>TypeScript</span><span>NestJS</span><span>GraphQL</span><span>Microservices</span><span>PostgreSQL</span>
         </div>
       </div>
 
-      <p class="section-label" style="margin-top: 1.5rem;">Enterprise</p>
+      <p class="section-label" style="margin-top: 1.5rem;"><span class="ico">🏭</span> Enterprise</p>
       <h2 class="section-title">Selected Enterprise Projects</h2>
       <div class="card enterprise-card reveal">
         <h3>SAMBU Manufacturing System</h3>
@@ -636,21 +834,21 @@
     </section>
 
     <section id="workflow" class="section reveal">
-      <p class="section-label">How I Build</p>
+      <p class="section-label"><span class="ico">🔄</span> How I Build</p>
       <h2 class="section-title">AI Development Workflow</h2>
       <p class="one-liner" style="margin-bottom: 1rem;">Typical approach when building AI-driven products.</p>
       <div class="workflow-box reveal">
         <p class="flow">Idea <span>→</span> Prompt <span>→</span> Prototype <span>→</span> Ship</p>
         <ul>
           <li>Design prompt instructions</li>
-          <li>Generate architecture and code using AI tools</li>
+          <li>Generate system architecture and code using AI tools</li>
           <li>Validate and refactor generated code</li>
           <li>Test quickly and iterate</li>
         </ul>
         <p class="tools-inline"><strong>Tools used daily:</strong> Cursor, Claude Code, AI assistants</p>
       </div>
 
-      <p class="section-label" style="margin-top: 1.5rem;">Now</p>
+      <p class="section-label" style="margin-top: 1.5rem;"><span class="ico">🔬</span> Now</p>
       <h2 class="section-title">Current Experiments</h2>
       <p class="one-liner" style="margin-bottom: 0.75rem;">Currently exploring:</p>
       <div class="experiments">
@@ -660,7 +858,7 @@
         <span class="experiment-tag">AI automation tools</span>
       </div>
 
-      <p class="section-label" style="margin-top: 1.5rem;">Focus</p>
+      <p class="section-label" style="margin-top: 1.5rem;"><span class="ico">♥</span> Focus</p>
       <h2 class="section-title">What I Enjoy Building</h2>
       <div class="enjoy-list">
         <span>AI-powered automation tools</span>
@@ -670,10 +868,21 @@
       </div>
     </section>
 
+    <section id="other-experiments" class="section reveal">
+      <p class="section-label"><span class="ico">⚡</span> Builder proof</p>
+      <h2 class="section-title">Things I Build</h2>
+      <ul class="other-experiments-list">
+        <li>AI Telegram news bots</li>
+        <li>AI crypto trading bot</li>
+        <li>AI content generation workflows</li>
+        <li>AI automation tools</li>
+      </ul>
+    </section>
+
     <footer id="contact" class="contact reveal">
-      <p class="section-label">Get in touch</p>
+      <p class="section-label"><span class="ico">✉</span> Get in touch</p>
       <h2 class="section-title">Contact</h2>
-      <a href="mailto:tht.it1502@gmail.com">tht.it1502@gmail.com</a>
+      <a href="mailto:thtt.it1502@gmail.com">thtt.it1502@gmail.com</a>
       <p style="margin-top:0.75rem;font-size:0.88rem;color:var(--text-muted);">
         <a href="https://github.com/thttit" target="_blank" rel="noopener noreferrer" style="color:var(--accent);">GitHub</a>
         ·

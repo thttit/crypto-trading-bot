@@ -1,26 +1,56 @@
-# Deploy chỉ Portfolio lên Vercel (từ repo crypto-trading-bot)
+# Deploy chỉ Portfolio lên Vercel
 
-## Các bước trên Vercel
+## Bước 1: Đảm bảo folder `portfolio-vercel` có trên GitHub
 
-1. Trên trang **New Project**, phần **Import Git Repository** → bấm **Import** bên cạnh repo **`crypto-trading-bot`**.
+1. Mở repo **crypto-trading-bot** trên GitHub: https://github.com/thttit/crypto-trading-bot  
+2. Kiểm tra xem có thư mục **portfolio-vercel** (bên cạnh `static`, `templates`) không.
 
-2. Trước khi bấm **Deploy**, tìm mục **Root Directory**:
-   - Bấm **Edit** (hoặc **Configure**) bên cạnh **Root Directory**.
-   - Nhập: **`portfolio-vercel`**.
-   - Xác nhận (Apply / Continue).
+**Nếu chưa thấy** → push từ máy local:
 
-3. **Framework Preset**: chọn **Other** (hoặc **None**).
+```bash
+cd c:\Users\khanh.mai\crypto-trading-bot
+git add portfolio-vercel
+git status
+git commit -m "Add portfolio-vercel for Vercel deploy"
+git push origin main
+```
 
-4. **Build and Output**: để mặc định (không cần build command).
-
-5. Bấm **Deploy**.
-
-Sau khi deploy xong, Vercel sẽ chỉ dùng nội dung trong thư mục `portfolio-vercel` (index.html + avatar.jpg), không chạy code Python hay bot. Bạn sẽ có URL dạng: `https://crypto-trading-bot-xxx.vercel.app` (hoặc tên project bạn đặt).
+Sau đó refresh lại trang repo trên GitHub.
 
 ---
 
-## Cập nhật portfolio sau này
+## Bước 2: Deploy trên Vercel
 
-1. Sửa file trong project (ví dụ `templates/portfolio.html` hoặc trực tiếp `portfolio-vercel/index.html` và `portfolio-vercel/avatar.jpg`).
-2. Push lên GitHub repo `crypto-trading-bot`.
-3. Vercel tự deploy lại (nếu đã bật auto-deploy). Hoặc vào Dashboard → Project → Deployments → Redeploy.
+### Cách A: Chọn Root Directory (khi đã có `portfolio-vercel` trên GitHub)
+
+1. **Import** repo **crypto-trading-bot**.
+2. Ở bước **Configure Project**, mục **Root Directory** → bấm **Edit**.
+3. Nếu trong list có **portfolio-vercel** → chọn **portfolio-vercel** → **Continue**.
+4. Nếu **không có** trong list nhưng bạn chắc đã push:
+   - Thử **Cancel** rồi **Import** lại repo (để Vercel refresh).
+   - Hoặc thử nhập tay **`portfolio-vercel`** nếu có ô nhập path.
+5. **Framework Preset**: **Other**. Bấm **Deploy**.
+
+### Cách B: Tạo repo riêng chỉ cho Portfolio (chắc chắn deploy đúng)
+
+Khi không chọn được Root Directory, dùng repo chỉ chứa nội dung portfolio:
+
+1. Trên GitHub: **New repository** → tên ví dụ **portfolio** (hoặc **thy-portfolio**) → Public → Create.
+2. Trên máy, tạo bản copy và push:
+
+```bash
+cd c:\Users\khanh.mai\crypto-trading-bot\portfolio-vercel
+git init
+git add .
+git commit -m "Portfolio static site"
+git branch -M main
+git remote add origin https://github.com/thttit/portfolio.git
+git push -u origin main
+```
+
+(Thay `thttit/portfolio` bằng tên repo bạn vừa tạo.)
+
+3. Trên Vercel: **New Project** → **Import** repo **portfolio** vừa tạo.  
+   Không cần chỉnh Root Directory → **Deploy**.
+
+Sau khi deploy xong, bạn sẽ có URL dạng `https://portfolio-xxx.vercel.app`.
