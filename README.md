@@ -217,3 +217,25 @@ Sau khi sửa, tải lại Dashboard. **Phân tích only** và dữ liệu giá 
 - Tích hợp API tin tức có sentiment (NewsAPI, CryptoNews API...) trong `news_analyzer.py`.
 - Lấy thêm funding rate, open interest từ Binance/Glassnode.
 - Thêm dashboard hoặc Telegram/Discord để nhận thông báo signal và lệnh.
+
+---
+
+## Đẩy code lên GitHub
+
+**Lưu ý:** File `.env` (chứa API key) đã được liệt kê trong `.gitignore` — **sẽ không bị push** lên GitHub. Chỉ dùng `.env.example` làm mẫu cấu hình.
+
+Nếu chưa tạo repo trên GitHub:
+
+1. Vào [GitHub](https://github.com/new), tạo repository mới tên `crypto-trading-bot` (có thể private hoặc public).
+2. Trong thư mục project (đã có `git init` và `remote origin` trỏ tới `https://github.com/thttit/crypto-trading-bot.git`), chạy:
+
+```bash
+git push -u origin master
+```
+
+Nếu GitHub dùng nhánh mặc định là `main`:
+
+```bash
+git branch -M main
+git push -u origin main
+```
