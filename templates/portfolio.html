@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tran Hoang Thanh Thy — AI-first Software Engineer & Full-stack Developer</title>
+  <meta name="description" content="Portfolio of Tran Hoang Thanh Thy: AI projects, enterprise systems, full-stack development. Ho Chi Minh City, Vietnam.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f5f3ef;
+      --bg-card: #ffffff;
+      --bg-elevated: #faf9f7;
+      --border: #e8e4df;
+      --border-subtle: #ebe8e3;
+      --text: #1c1c1c;
+      --text-muted: #5a564e;
+      --text-dim: #7a756d;
+      --accent: #0d9488;
+      --accent-dim: #0f766e;
+      --accent-glow: rgba(13, 148, 136, 0.12);
+      --highlight: #0d9488;
+      --highlight-dim: rgba(13, 148, 136, 0.08);
+      --gold: #b45309;
+      --radius: 16px;
+      --radius-sm: 12px;
+      --max-w: 800px;
+      --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      font-size: 1rem;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(13, 148, 136, 0.06), transparent),
+                        linear-gradient(rgba(13, 148, 136, 0.02) 1px, transparent 1px);
+      background-size: 100% 100%, 32px 32px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 4rem;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.55s var(--ease-out), transform 0.55s var(--ease-out);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.06s; }
+    .reveal-delay-2 { transition-delay: 0.12s; }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.65; transform: scale(0.92); }
+    }
+
+    .section { margin-bottom: 2.75rem; }
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+      margin-bottom: 0.45rem;
+    }
+    .section-title {
+      font-size: 1.22rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 0.9rem;
+    }
+
+    /* ----- Hero with avatar ----- */
+    .hero {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1.75rem;
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .hero-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--border);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      flex-shrink: 0;
+    }
+    .hero-text { flex: 1; min-width: 200px; }
+    .hero .name {
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin-bottom: 0.35rem;
+    }
+    .hero .title {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3em;
+      align-items: center;
+    }
+    .hero .title .sep { color: var(--text-dim); font-weight: 400; }
+    .hero .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-top: 0.4rem;
+    }
+    .hero .meta a {
+      color: var(--accent);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .hero .meta a:hover { color: var(--accent-dim); text-decoration: underline; }
+    .hero .location::before { content: '📍 '; }
+    .hero .email::before { content: '✉ '; }
+
+    /* ----- Featured AI card (top) ----- */
+    .featured-ai {
+      margin-bottom: 2.25rem;
+    }
+    .featured-ai .section-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.3rem 0.6rem;
+      background: var(--accent-glow);
+      border-radius: 8px;
+      margin-bottom: 0.6rem;
+    }
+    .featured-ai .section-label::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse-dot 1.8s ease-in-out infinite;
+    }
+    .github-card-featured {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.1rem;
+      background: var(--bg-card);
+      border: 2px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 1.35rem 1.5rem;
+      text-decoration: none;
+      color: inherit;
+      transition: box-shadow 0.3s, transform 0.3s;
+      box-shadow: 0 4px 20px var(--accent-glow);
+    }
+    .github-card-featured:hover {
+      box-shadow: 0 12px 40px rgba(13, 148, 136, 0.18);
+      transform: translateY(-3px);
+    }
+    .github-card-featured .icon-wrap {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dim) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 1.5rem;
+    }
+    .github-card-featured .body h3 {
+      font-size: 1.08rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 0.3rem;
+    }
+    .github-card-featured .body .repo-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+      line-height: 1.5;
+    }
+    .github-card-featured .body .repo-meta {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .github-card-featured .body .repo-link {
+      font-size: 0.85rem;
+      color: var(--accent);
+      font-weight: 600;
+      margin-top: 0.4rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    /* ----- Nav ----- */
+    .nav-anchors {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-bottom: 1.75rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .nav-anchors a {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 0.4rem 0.7rem;
+      border-radius: 10px;
+      transition: background 0.2s, color 0.2s;
+    }
+    .nav-anchors a:hover {
+      background: var(--bg-elevated);
+      color: var(--accent);
+    }
+
+    /* ----- About ----- */
+    .about p {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-bottom: 0.85rem;
+      max-width: 65ch;
+    }
+    .about p:last-child { margin-bottom: 0; }
+
+    /* ----- Tech Stack ----- */
+    .tech-group { margin-bottom: 1.35rem; }
+    .tech-group:last-child { margin-bottom: 0; }
+    .tech-group-title {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.55rem;
+    }
+    .tech-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .tech-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      padding: 0.35rem 0.65rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text-muted);
+      transition: border-color 0.2s, color 0.2s, box-shadow 0.2s;
+    }
+    .tech-tag:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      box-shadow: 0 2px 10px var(--accent-glow);
+    }
+    .tech-tag.ai-tool {
+      border-color: rgba(13, 148, 136, 0.35);
+      color: var(--accent-dim);
+    }
+    .tech-tag.ai-tool:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ----- Cards ----- */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.3rem 1.45rem;
+      margin-bottom: 1rem;
+      transition: border-color 0.25s, box-shadow 0.25s;
+    }
+    .card:hover {
+      border-color: var(--border-subtle);
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+    }
+    .card h3 {
+      font-size: 1.04rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.35rem;
+    }
+    .card .one-liner {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 0.7rem;
+      line-height: 1.55;
+    }
+    .card ul {
+      list-style: none;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+    .card ul li {
+      padding-left: 1.15rem;
+      position: relative;
+      margin-bottom: 0.28rem;
+    }
+    .card ul li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+    .card .tech {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.8rem;
+    }
+    .card .tech span {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      padding: 0.25rem 0.5rem;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-dim);
+    }
+
+    /* ----- Experience ----- */
+    .exp-card .company { font-size: 0.9rem; color: var(--accent); font-weight: 600; margin-bottom: 0.2rem; }
+    .exp-card .date { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 0.55rem; }
+    .enterprise-card .modules { font-size: 0.82rem; color: var(--text-dim); margin-top: 0.5rem; }
+    .enterprise-card .modules span { margin-right: 0.5rem; }
+
+    /* ----- Workflow ----- */
+    .workflow-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.2rem 1.45rem;
+      margin-bottom: 1rem;
+    }
+    .workflow-box .flow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--accent);
+      margin: 0.5rem 0 0.9rem;
+      letter-spacing: 0.02em;
+    }
+    .workflow-box .flow span { color: var(--text-dim); font-weight: 400; }
+    .workflow-box ul { list-style: none; font-size: 0.88rem; color: var(--text-muted); }
+    .workflow-box ul li { padding-left: 1.15rem; position: relative; margin-bottom: 0.32rem; }
+    .workflow-box ul li::before { content: '•'; position: absolute; left: 0; color: var(--accent); }
+    .workflow-box .tools-inline { font-size: 0.88rem; color: var(--text-muted); margin-top: 0.7rem; }
+    .workflow-box .tools-inline strong { color: var(--text); }
+
+    /* ----- Experiments ----- */
+    .experiments { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .experiment-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.45rem 0.85rem;
+      background: var(--highlight-dim);
+      border: 1px solid rgba(13, 148, 136, 0.25);
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--accent);
+      transition: background 0.2s, border-color 0.2s, transform 0.2s;
+    }
+    .experiment-tag:hover {
+      background: var(--accent-glow);
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+    .experiment-tag::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      margin-right: 0.5rem;
+      animation: pulse-dot 1.8s ease-in-out infinite;
+    }
+
+    /* ----- Enjoy ----- */
+    .enjoy-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .enjoy-list span {
+      font-size: 0.88rem;
+      padding: 0.4rem 0.75rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .enjoy-list span:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ----- Contact ----- */
+    .contact {
+      margin-top: 2.25rem;
+      padding-top: 1.75rem;
+      border-top: 1px solid var(--border);
+    }
+    .contact a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1rem;
+    }
+    .contact a:hover { color: var(--accent-dim); text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- Hero with avatar -->
+    <header class="hero reveal">
+      <img src="/static/avatar.png" alt="Tran Hoang Thanh Thy" class="hero-avatar reveal" />
+      <div class="hero-text">
+        <h1 class="name reveal reveal-delay-1">Tran Hoang Thanh Thy</h1>
+        <p class="title reveal reveal-delay-1">
+          <span>AI-first Software Engineer</span>
+          <span class="sep">|</span>
+          <span>Full-stack Developer</span>
+          <span class="sep">|</span>
+          <span>Builder</span>
+        </p>
+        <div class="meta reveal reveal-delay-2">
+          <span class="location">Ho Chi Minh City, Vietnam</span>
+          <a class="email" href="mailto:tht.it1502@gmail.com">tht.it1502@gmail.com</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Featured: AI project card (top) -->
+    <section class="featured-ai reveal">
+      <p class="section-label">Featured — AI Project</p>
+      <a href="https://github.com/thttit/crypto-trading-bot" target="_blank" rel="noopener noreferrer" class="github-card-featured" title="Open crypto-trading-bot on GitHub">
+        <div class="icon-wrap" aria-hidden="true">🤖</div>
+        <div class="body">
+          <h3>crypto-trading-bot</h3>
+          <p class="repo-desc">Experimental AI-powered trading bot for Binance Futures. Real-time market data, signal analysis, automated execution. Built with Cursor AI & Node.js.</p>
+          <p class="repo-meta">Node.js · Binance API · Cursor AI · REST APIs</p>
+          <span class="repo-link">View on GitHub →</span>
+        </div>
+      </a>
+    </section>
+
+    <nav class="nav-anchors reveal">
+      <a href="#about">About</a>
+      <a href="#tech">Tech Stack</a>
+      <a href="#ai-projects">AI Projects</a>
+      <a href="#experience">Experience</a>
+      <a href="#workflow">Workflow</a>
+      <a href="#contact">Contact</a>
+    </nav>
+
+    <section id="about" class="section about reveal">
+      <p class="section-label">About Me</p>
+      <h2 class="section-title">About Me</h2>
+      <p>Software engineer who enjoys building products and experimenting with AI tools.</p>
+      <p>My background is in full-stack development with technologies such as React, Next.js, Node.js, NestJS, GraphQL, and microservices. Recently, I've been integrating AI-assisted development workflows into my daily work using tools like Cursor and Claude Code.</p>
+      <p>Besides production software, I like building small AI experiments including Telegram bots, crypto trading bots, and AI-driven content generation workflows.</p>
+      <p>I'm particularly interested in environments where engineers can move fast, experiment with ideas, and ship real products.</p>
+    </section>
+
+    <section id="tech" class="section reveal">
+      <p class="section-label">Skills</p>
+      <h2 class="section-title">Tech Stack</h2>
+      <div class="tech-group">
+        <p class="tech-group-title">Languages</p>
+        <div class="tech-tags">
+          <span class="tech-tag">JavaScript</span>
+          <span class="tech-tag">TypeScript</span>
+          <span class="tech-tag">Java</span>
+          <span class="tech-tag">Python</span>
+          <span class="tech-tag">C#</span>
+        </div>
+      </div>
+      <div class="tech-group">
+        <p class="tech-group-title">Frontend</p>
+        <div class="tech-tags">
+          <span class="tech-tag">React</span>
+          <span class="tech-tag">Next.js</span>
+          <span class="tech-tag">Angular</span>
+          <span class="tech-tag">Redux</span>
+          <span class="tech-tag">Tailwind CSS</span>
+        </div>
+      </div>
+      <div class="tech-group">
+        <p class="tech-group-title">Backend</p>
+        <div class="tech-tags">
+          <span class="tech-tag">Node.js</span>
+          <span class="tech-tag">NestJS</span>
+          <span class="tech-tag">Spring Boot</span>
+        </div>
+      </div>
+      <div class="tech-group">
+        <p class="tech-group-title">APIs & Communication</p>
+        <div class="tech-tags">
+          <span class="tech-tag">REST APIs</span>
+          <span class="tech-tag">GraphQL</span>
+          <span class="tech-tag">gRPC</span>
+        </div>
+      </div>
+      <div class="tech-group">
+        <p class="tech-group-title">Infrastructure</p>
+        <div class="tech-tags">
+          <span class="tech-tag">Docker</span>
+          <span class="tech-tag">CI/CD</span>
+          <span class="tech-tag">AWS Lambda</span>
+          <span class="tech-tag">Firebase</span>
+        </div>
+      </div>
+      <div class="tech-group">
+        <p class="tech-group-title">Databases</p>
+        <div class="tech-tags">
+          <span class="tech-tag">PostgreSQL</span>
+          <span class="tech-tag">MongoDB</span>
+          <span class="tech-tag">Oracle</span>
+        </div>
+      </div>
+      <div class="tech-group">
+        <p class="tech-group-title">AI Development Tools</p>
+        <div class="tech-tags">
+          <span class="tech-tag ai-tool">Cursor IDE</span>
+          <span class="tech-tag ai-tool">Claude Code</span>
+          <span class="tech-tag ai-tool">Google AI Studio</span>
+          <span class="tech-tag ai-tool">Prompt Engineering</span>
+          <span class="tech-tag ai-tool">AI-assisted workflows</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="ai-projects" class="section reveal">
+      <p class="section-label">Things I Built</p>
+      <h2 class="section-title">AI Projects & Experiments</h2>
+
+      <article class="card reveal">
+        <h3>AI Crypto Trading Bot (Binance Futures)</h3>
+        <p class="one-liner">Built an experimental trading bot capable of executing automated futures trades on Binance. The system retrieves market data, evaluates trading signals, and executes trades programmatically.</p>
+        <ul>
+          <li>Real-time market data integration using Binance Futures API</li>
+          <li>Automated trade execution</li>
+          <li>AI-assisted development using Cursor IDE</li>
+          <li>Rapid strategy experimentation</li>
+        </ul>
+        <div class="tech">
+          <span>Node.js</span><span>Binance API</span><span>Cursor AI</span><span>REST APIs</span>
+        </div>
+      </article>
+
+      <article class="card reveal">
+        <h3>AI Telegram Information Agents</h3>
+        <p class="one-liner">Developed AI-powered Telegram bots designed to deliver global news and crypto market updates directly in chat. The bots collect information from online sources and summarize it for users. I also designed distinct conversational personalities for the bots so they interact with users in a more natural way.</p>
+        <ul>
+          <li>Automated news aggregation</li>
+          <li>AI-generated summaries</li>
+          <li>Conversational interaction in Telegram</li>
+          <li>Personality-based response design</li>
+        </ul>
+        <div class="tech">
+          <span>Claude Code</span><span>Telegram Bot API</span><span>Node.js</span><span>Prompt Engineering</span>
+        </div>
+      </article>
+
+      <article class="card reveal">
+        <h3>AI Content Generation Workflow</h3>
+        <p class="one-liner">Built an experimental pipeline for AI-generated content creation. This workflow uses generative AI tools to create characters and modify visual elements automatically.</p>
+        <ul>
+          <li>AI-generated characters and scenes</li>
+          <li>Automated visual transformation workflows</li>
+          <li>Prompt engineering for controlling AI output</li>
+        </ul>
+        <div class="tech">
+          <span>Google AI Studio</span><span>Generative AI</span><span>Prompt engineering</span>
+        </div>
+      </article>
+
+      <article class="card reveal">
+        <h3>AI Research & Automation Tools</h3>
+        <p class="one-liner">Built small AI-assisted tools combining web crawling and generative AI models. These tools automatically collect information and generate structured responses.</p>
+        <ul>
+          <li>Research automation</li>
+          <li>Information summarization</li>
+          <li>Productivity tools</li>
+        </ul>
+        <div class="tech">
+          <span>Web crawling</span><span>Generative AI</span><span>Automation</span>
+        </div>
+      </article>
+    </section>
+
+    <section id="experience" class="section reveal">
+      <p class="section-label">Career</p>
+      <h2 class="section-title">Professional Experience</h2>
+      <div class="card exp-card reveal">
+        <h3>Software Developer</h3>
+        <p class="company">Cyberlogitec Vietnam</p>
+        <p class="date">Jan 2024 – Present</p>
+        <p class="one-liner">Working on enterprise manufacturing systems for Korean industrial companies. Develop full-stack applications supporting factory operations including MRP, MES, WMS, and logistics systems.</p>
+        <div class="tech">
+          <span>React</span><span>Next.js</span><span>TypeScript</span><span>NestJS</span><span>GraphQL</span><span>Microservices</span><span>PostgreSQL</span>
+        </div>
+      </div>
+
+      <p class="section-label" style="margin-top: 1.5rem;">Enterprise</p>
+      <h2 class="section-title">Selected Enterprise Projects</h2>
+      <div class="card enterprise-card reveal">
+        <h3>SAMBU Manufacturing System</h3>
+        <p class="one-liner">Enterprise platform supporting factory operations including MRP, MES, WMS, and logistics systems.</p>
+        <ul>
+          <li>Developed backend microservices</li>
+          <li>Built frontend interfaces using Next.js</li>
+          <li>Designed APIs connecting production systems</li>
+        </ul>
+        <p class="modules"><span>MRP</span><span>MES</span><span>WMS</span><span>Logistics</span></p>
+      </div>
+      <div class="card enterprise-card reveal">
+        <h3>SEOYOUNG Steel Manufacturing Platform</h3>
+        <p class="one-liner">Enterprise system for steel manufacturing operations.</p>
+        <ul>
+          <li>Implemented RBAC permission systems</li>
+          <li>Built full-stack features</li>
+          <li>Integrated microservices across factory systems</li>
+        </ul>
+        <p class="modules"><span>COM</span><span>MRP</span><span>MES</span><span>LGS</span><span>WMS</span></p>
+      </div>
+    </section>
+
+    <section id="workflow" class="section reveal">
+      <p class="section-label">How I Build</p>
+      <h2 class="section-title">AI Development Workflow</h2>
+      <p class="one-liner" style="margin-bottom: 1rem;">Typical approach when building AI-driven products.</p>
+      <div class="workflow-box reveal">
+        <p class="flow">Idea <span>→</span> Prompt <span>→</span> Prototype <span>→</span> Ship</p>
+        <ul>
+          <li>Design prompt instructions</li>
+          <li>Generate architecture and code using AI tools</li>
+          <li>Validate and refactor generated code</li>
+          <li>Test quickly and iterate</li>
+        </ul>
+        <p class="tools-inline"><strong>Tools used daily:</strong> Cursor, Claude Code, AI assistants</p>
+      </div>
+
+      <p class="section-label" style="margin-top: 1.5rem;">Now</p>
+      <h2 class="section-title">Current Experiments</h2>
+      <p class="one-liner" style="margin-bottom: 0.75rem;">Currently exploring:</p>
+      <div class="experiments">
+        <span class="experiment-tag">AI trading strategies for crypto markets</span>
+        <span class="experiment-tag">AI conversational agents</span>
+        <span class="experiment-tag">AI content generation pipelines</span>
+        <span class="experiment-tag">AI automation tools</span>
+      </div>
+
+      <p class="section-label" style="margin-top: 1.5rem;">Focus</p>
+      <h2 class="section-title">What I Enjoy Building</h2>
+      <div class="enjoy-list">
+        <span>AI-powered automation tools</span>
+        <span>Conversational AI agents</span>
+        <span>Rapid prototypes</span>
+        <span>Experimental AI products</span>
+      </div>
+    </section>
+
+    <footer id="contact" class="contact reveal">
+      <p class="section-label">Get in touch</p>
+      <h2 class="section-title">Contact</h2>
+      <a href="mailto:tht.it1502@gmail.com">tht.it1502@gmail.com</a>
+      <p style="margin-top:0.75rem;font-size:0.88rem;color:var(--text-muted);">
+        <a href="https://github.com/thttit" target="_blank" rel="noopener noreferrer" style="color:var(--accent);">GitHub</a>
+        ·
+        <a href="https://www.linkedin.com/in/thy-tran-0013a7267/" target="_blank" rel="noopener noreferrer" style="color:var(--accent);">LinkedIn</a>
+      </p>
+    </footer>
+  </div>
+
+  <script>
+    (function() {
+      const reveals = document.querySelectorAll('.reveal');
+      const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) entry.target.classList.add('visible');
+        });
+      }, { rootMargin: '0px 0px -40px 0px', threshold: 0.05 });
+      reveals.forEach(function(el) { observer.observe(el); });
+    })();
+  </script>
+</body>
+</html>

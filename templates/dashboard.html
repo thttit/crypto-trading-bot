@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crypto Bot — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0c0e12;
+      --bg-card: #14171e;
+      --bg-hover: #1a1e28;
+      --border: #252a35;
+      --text: #e6eaf0;
+      --text-muted: #8b92a0;
+      --accent: #00d4aa;
+      --accent-dim: #00a884;
+      --danger: #f6465d;
+      --danger-dim: #c7384a;
+      --warning: #f0b90b;
+      --radius: 12px;
+      --shadow: 0 4px 24px rgba(0,0,0,0.35);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.5; }
+    .layout { max-width: 1200px; margin: 0 auto; padding: 24px 20px; }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo { font-weight: 700; font-size: 1.35rem; letter-spacing: -0.02em; color: var(--text); }
+    .logo span { color: var(--accent); }
+    .status-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; }
+    .badge-paper { background: rgba(240, 185, 11, 0.15); color: var(--warning); }
+    .badge-live { background: rgba(246, 70, 93, 0.15); color: var(--danger); }
+    .badge-idle { background: rgba(0, 212, 170, 0.12); color: var(--accent); }
+    .badge-running { background: rgba(0, 212, 170, 0.2); color: var(--accent); animation: pulse 1.2s ease-in-out infinite; }
+    @keyframes pulse { 50% { opacity: 0.8; } }
+    .balance { font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; color: var(--text-muted); }
+    .balance strong { color: var(--accent); }
+    .balance-wrap { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .balance-label { font-size: 0.8rem; color: var(--text-muted); }
+    .balance-select { padding: 6px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-hover); color: var(--text); font-size: 0.85rem; cursor: pointer; }
+    .balance-error { font-size: 0.75rem; color: var(--warning); margin-top: 4px; max-width: 320px; line-height: 1.35; }
+    .balance-error a { color: var(--accent); }
+
+    .tabs { display: flex; gap: 4px; margin-bottom: 24px; border-bottom: 1px solid var(--border); }
+    .tab { padding: 12px 20px; cursor: pointer; font-weight: 600; font-size: 0.9rem; color: var(--text-muted); border-radius: 8px 8px 0 0; }
+    .tab:hover { color: var(--text); background: var(--bg-hover); }
+    .tab.active { color: var(--accent); background: var(--bg-card); border: 1px solid var(--border); border-bottom: 1px solid var(--bg-card); margin-bottom: -1px; }
+
+    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); }
+    .card h2 { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 12px; }
+    .grid { display: grid; gap: 20px; }
+    .grid-2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+    .form-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin-bottom: 12px; }
+    .form-row label { min-width: 140px; font-size: 0.9rem; color: var(--text-muted); }
+    .form-row input[type="number"] { width: 100px; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-hover); color: var(--text); font-family: 'JetBrains Mono', monospace; }
+    .form-row input[type="number"]:focus { outline: none; border-color: var(--accent); }
+
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border: none; border-radius: 10px; font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: transform 0.08s, box-shadow 0.2s; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn:not(:disabled):hover { transform: translateY(-1px); }
+    .btn-primary { background: var(--accent); color: var(--bg); }
+    .btn-primary:not(:disabled):hover { box-shadow: 0 6px 20px rgba(0, 212, 170, 0.35); }
+    .btn-secondary { background: var(--bg-hover); color: var(--text); border: 1px solid var(--border); }
+    .btn-danger { background: rgba(246, 70, 93, 0.15); color: var(--danger); border: 1px solid rgba(246, 70, 93, 0.35); }
+    .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+    th { color: var(--text-muted); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    tr:hover { background: var(--bg-hover); }
+    .dir-long { color: var(--accent); font-weight: 600; }
+    .dir-short { color: var(--danger); font-weight: 600; }
+    .conf { font-family: 'JetBrains Mono', monospace; }
+    .pnl-pos { color: var(--accent); }
+    .pnl-neg { color: var(--danger); }
+
+    .log-box { background: #0a0b0f; border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; max-height: 280px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; line-height: 1.6; color: var(--text-muted); white-space: pre-wrap; word-break: break-all; }
+    .empty-state { text-align: center; padding: 32px 20px; color: var(--text-muted); }
+    .alert { padding: 12px 16px; border-radius: 10px; margin-bottom: 16px; font-size: 0.9rem; }
+    .alert-warning { background: rgba(240, 185, 11, 0.12); border: 1px solid rgba(240, 185, 11, 0.3); color: var(--warning); }
+    .alert-error { background: rgba(246, 70, 93, 0.12); border: 1px solid rgba(246, 70, 93, 0.3); color: var(--danger); }
+    .alert-info { background: rgba(0, 212, 170, 0.08); border: 1px solid rgba(0, 212, 170, 0.25); color: var(--accent); }
+    .section { margin-bottom: 24px; }
+    .section-title { font-size: 1rem; font-weight: 600; margin-bottom: 12px; color: var(--text); }
+
+    .coin-selector { position: relative; display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; background: var(--bg-hover); border: 1px solid var(--border); border-radius: 10px; cursor: pointer; }
+    .coin-selector:hover { border-color: var(--accent); }
+    .coin-icon { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-dim), var(--accent)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.7rem; }
+    .coin-dropdown { position: absolute; top: 100%; left: 0; margin-top: 4px; min-width: 200px; max-height: 320px; overflow-y: auto; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); z-index: 100; display: none; }
+    .coin-dropdown.show { display: block; }
+    .coin-option { padding: 10px 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border); }
+    .coin-option:hover { background: var(--bg-hover); }
+    .coin-option:last-child { border-bottom: none; }
+
+    .evidence-box { background: rgba(0, 212, 170, 0.06); border: 1px solid rgba(0, 212, 170, 0.25); border-radius: var(--radius); padding: 16px; margin: 16px 0; }
+    .evidence-box h3 { font-size: 0.9rem; margin-bottom: 12px; color: var(--accent); }
+    .evidence-item { font-size: 0.85rem; margin-bottom: 8px; color: var(--text-muted); }
+    .evidence-item strong { color: var(--text); }
+    .confirm-execute { margin-top: 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .confirm-execute input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; }
+    .confirm-execute label { cursor: pointer; font-size: 0.9rem; }
+
+    .position-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
+    .position-card-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .position-card h4 { display: flex; align-items: center; gap: 8px; font-size: 1rem; }
+    .position-card .pnl { font-size: 1.1rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+    .position-card .meta { font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; }
+    .position-card .meta span { margin-right: 16px; }
+
+    .chat-messages { min-height: 320px; max-height: 420px; overflow-y: auto; padding: 16px; background: #0a0b0f; border-radius: var(--radius); margin-bottom: 16px; border: 1px solid var(--border); }
+    .chat-msg { margin-bottom: 16px; padding: 12px 14px; border-radius: 10px; max-width: 90%; }
+    .chat-msg.user { background: rgba(0, 212, 170, 0.12); margin-left: 0; margin-right: auto; }
+    .chat-msg.bot { background: var(--bg-hover); margin-left: auto; margin-right: 0; white-space: pre-wrap; }
+    .chat-msg .label { font-size: 0.7rem; color: var(--text-muted); margin-bottom: 4px; }
+    .chat-input-row { display: flex; gap: 12px; align-items: flex-end; }
+    .chat-input-row textarea { flex: 1; min-height: 80px; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-hover); color: var(--text); font-family: inherit; resize: vertical; }
+    .chat-input-row textarea:focus { outline: none; border-color: var(--accent); }
+
+    .indicators-panel { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; margin-top: 12px; }
+    .indicators-panel span { font-size: 0.8rem; padding: 6px 10px; background: var(--bg-hover); border-radius: 8px; font-family: 'JetBrains Mono', monospace; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <header>
+      <div style="display:flex;align-items:center;gap:20px;">
+        <div class="logo">Crypto Bot <span>Dashboard</span></div>
+        <a href="/portfolio" style="font-size:0.9rem;color:var(--accent);text-decoration:none;">Portfolio</a>
+      </div>
+      <div class="status-row">
+        <div class="coin-selector" id="coinSelector" title="Chọn coin để xem chỉ số">
+          <span class="coin-icon" id="coinIcon">B</span>
+          <span id="coinSymbol">BTCUSDT</span>
+          <span style="font-size:0.7rem;color:var(--text-muted)">▼</span>
+        </div>
+        <div class="coin-dropdown" id="coinDropdown"></div>
+        <div class="balance-wrap">
+          <label class="balance-label">Tài khoản:</label>
+          <select id="balanceMode" class="balance-select">
+            <option value="mainnet">Thật (Mainnet)</option>
+            <option value="testnet">Demo (Testnet)</option>
+            <option value="demo_500">Demo 500 USDT</option>
+            <option value="demo_1000">Demo 1000 USDT</option>
+            <option value="demo_5000">Demo 5000 USDT</option>
+          </select>
+          <span class="balance" id="balance">-- USDT</span>
+          <div class="balance-error" id="balanceError" style="display:none;"></div>
+        </div>
+        <details class="wallet-keys-details" style="margin-left:12px;">
+          <summary style="cursor:pointer;font-size:0.85rem;color:var(--text-muted);">Cấu hình API ví</summary>
+          <div class="wallet-keys-form" style="margin-top:12px;padding:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);max-width:480px;">
+            <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px;">Nhập API key cho từng loại tài khoản. Sau khi Lưu, chọn tài khoản tương ứng ở dropdown trên để cập nhật số dư.</p>
+            <div class="wallet-key-block" style="margin-bottom:16px;">
+              <strong style="font-size:0.9rem;">Thật (Mainnet)</strong>
+              <span id="mainnetKeyStatus" class="key-status" style="font-size:0.75rem;color:var(--text-muted);margin-left:8px;"></span>
+              <div class="form-row" style="margin-top:6px;"><input type="password" id="walletKeyMainnet" placeholder="API Key" style="width:100%;padding:8px;"></div>
+              <div class="form-row"><input type="password" id="walletSecretMainnet" placeholder="API Secret" style="width:100%;padding:8px;"></div>
+              <button type="button" class="btn btn-sm btn-primary" id="btnSaveMainnet">Lưu Mainnet</button>
+            </div>
+            <div class="wallet-key-block">
+              <strong style="font-size:0.9rem;">Demo (Testnet)</strong>
+              <span id="testnetKeyStatus" class="key-status" style="font-size:0.75rem;color:var(--text-muted);margin-left:8px;"></span>
+              <div class="form-row" style="margin-top:6px;"><input type="password" id="walletKeyTestnet" placeholder="API Key (từ testnet.binancefuture.com)" style="width:100%;padding:8px;"></div>
+              <div class="form-row"><input type="password" id="walletSecretTestnet" placeholder="API Secret" style="width:100%;padding:8px;"></div>
+              <button type="button" class="btn btn-sm btn-primary" id="btnSaveTestnet">Lưu Testnet</button>
+            </div>
+          </div>
+        </details>
+        <span class="badge badge-paper" id="modeBadge">PAPER</span>
+        <span class="badge badge-idle" id="runBadge">Idle</span>
+      </div>
+    </header>
+
+    <div id="coinIndicatorsCard" class="card section" style="display:none;">
+      <h2>Chỉ số <span id="indicatorSymbol">BTCUSDT</span></h2>
+      <p id="indicatorSummary" class="section-title" style="font-size:0.85rem;color:var(--text-muted);"></p>
+      <div class="indicators-panel" id="indicatorsPanel"></div>
+    </div>
+
+    <div class="alert alert-info" id="testnetSafeNote" style="display:none;margin-top:8px;">Lệnh gửi lên <strong>Testnet</strong> — không tốn tiền thật. Số dư và vị thế lấy từ ví Testnet của bạn.</div>
+    <div class="alert alert-warning" id="liveWarning" style="display:none;">
+      <strong>Chế độ LIVE:</strong> Bot sẽ đặt lệnh thật trên sàn. Đảm bảo đã test kỹ ở chế độ Paper và dùng vốn nhỏ.
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="overview">Tổng quan</button>
+      <button class="tab" data-tab="history">Lịch sử vị thế</button>
+      <button class="tab" data-tab="chat">Chat AI</button>
+    </div>
+
+    <div id="tab-overview" class="tab-content active">
+      <div class="grid grid-2 section">
+        <div class="card">
+          <h2>Cấu hình (có thể chỉnh)</h2>
+          <div class="form-row">
+            <label>Min confidence (%) — 65–90%</label>
+            <input type="number" id="inputMinConf" min="65" max="90" step="1" value="65">
+          </div>
+          <div class="form-row">
+            <label>Leverage (x)</label>
+            <input type="number" id="inputLeverage" min="1" max="125" step="1" value="5">
+          </div>
+          <div class="form-row">
+            <label>Stop Loss (%)</label>
+            <input type="number" id="inputSL" min="0.1" max="20" step="0.5" value="2">
+          </div>
+          <div class="form-row">
+            <label>Take Profit (%)</label>
+            <input type="number" id="inputTP" min="0.1" max="50" step="0.5" value="4">
+          </div>
+          <div class="form-row">
+            <label>Max position (%)</label>
+            <input type="number" id="inputMaxPos" min="1" max="100" step="1" value="5">
+          </div>
+          <button class="btn btn-primary btn-sm" id="btnSaveConfig">Lưu cấu hình</button>
+        </div>
+        <div class="card">
+          <h2>Hành động</h2>
+          <div class="form-row">
+            <label>Limit USDT lần vào lệnh (0 = không giới hạn)</label>
+            <input type="number" id="inputLimitUsdt" min="0" step="1" value="0" placeholder="0">
+          </div>
+          <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:12px;">
+            <strong>Phân tích only</strong>: chỉ hiển thị signal. Sau đó chọn coin (checkbox) và bấm <strong>Vào lệnh đã chọn</strong>, hoặc <strong>Vào lệnh tất cả</strong> cho mọi coin đạt ngưỡng. Bot chia đều Limit USDT (nếu đặt) cho từng lệnh.
+          </p>
+          <div class="actions" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:12px;">
+            <button class="btn btn-secondary" id="btnAnalyze" type="button">Phân tích only</button>
+            <button class="btn btn-primary" id="btnExecuteSelected" type="button" disabled>Vào lệnh đã chọn</button>
+            <button class="btn btn-primary" id="btnExecuteAll" type="button">Vào lệnh tất cả (đạt ngưỡng)</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="evidenceSection" class="section" style="display:none;">
+        <div class="card">
+          <h2>Bằng chứng (độ tin cậy 65%-90%)</h2>
+          <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:12px;">Bot đã tính toán dựa trên chỉ báo kỹ thuật và tin tức. Xem xét kỹ trước khi vào lệnh.</p>
+          <div id="evidenceList"></div>
+          <div class="confirm-execute">
+            <input type="checkbox" id="confirmEvidence" />
+            <label for="confirmEvidence">Tôi đã xem bằng chứng và đồng ý vào lệnh</label>
+            <button class="btn btn-primary" id="btnExecuteAfterEvidence" type="button" disabled>Vào lệnh</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Lệnh đang chạy (realtime)</div>
+        <div class="card">
+          <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;">Cập nhật mỗi 2 giây. PNL & ROI từ Binance. <strong>Chế độ Paper:</strong> bot không gửi lệnh thật nên danh sách sẽ trống.</p>
+          <div id="openPositionsSection">
+            <table>
+              <thead>
+                <tr><th>Symbol</th><th>Hướng</th><th>Entry</th><th>Mark</th><th>PNL (USDT)</th><th>ROI %</th><th>Leverage</th></tr>
+              </thead>
+              <tbody id="openPositionsBody"></tbody>
+            </table>
+            <div class="empty-state" id="openPositionsEmpty" style="display:none;"><p>Không có vị thế đang mở.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Kết quả chu kỳ</div>
+        <div class="card">
+          <div id="runMessage"></div>
+          <div id="signalsSection" style="display:none;">
+            <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;">Chọn coin muốn vào lệnh (chỉ áp dụng cho dòng đạt ngưỡng), rồi bấm "Vào lệnh đã chọn".</p>
+            <table>
+              <thead>
+                <tr><th style="width:42px">Chọn</th><th>Symbol</th><th>Hướng</th><th>Confidence</th><th>Lý do</th></tr>
+              </thead>
+              <tbody id="signalsBody"></tbody>
+            </table>
+          </div>
+          <div id="executedSection" style="display:none;margin-top:16px;">
+            <div class="section-title">Lệnh đã thực thi</div>
+            <p id="executedPaperNote" class="alert alert-warning" style="display:none;margin-bottom:12px;font-size:0.85rem;">Chế độ <strong>Paper</strong>: lệnh chỉ được ghi nhận (giả lập), <strong>chưa gửi lên sàn</strong>. Để vào lệnh thật: đặt <code>TRADE_MODE=live</code> trong file <code>.env</code> rồi khởi động lại dashboard.</p>
+            <table>
+              <thead>
+                <tr><th>Symbol</th><th>Hướng</th><th>Confidence</th><th>Trạng thái</th></tr>
+              </thead>
+              <tbody id="executedBody"></tbody>
+            </table>
+          </div>
+          <div class="empty-state" id="emptyState">
+            <p>Chưa chạy chu kỳ. Bấm "Phân tích only" hoặc "Chạy 1 chu kỳ".</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Log</div>
+        <div class="card">
+          <button class="btn btn-secondary btn-sm" id="btnRefreshLog" style="margin-bottom:12px;">Làm mới log</button>
+          <div class="log-box" id="logBox"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-history" class="tab-content">
+      <div class="section">
+        <div class="section-title">Lịch sử vị thế (Lãi lỗ đã thực hiện)</div>
+        <button class="btn btn-secondary btn-sm" id="btnRefreshHistory" style="margin-bottom:12px;">Tải lại</button>
+        <div id="positionHistoryList"></div>
+      </div>
+    </div>
+
+    <div id="tab-chat" class="tab-content">
+      <div class="card">
+        <h2>Chat AI — Hỏi về crypto, thị trường, xu hướng, phân tích coin</h2>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input-row">
+          <textarea id="chatInput" placeholder="Nhập câu hỏi (ví dụ: Xu hướng BTC tuần này? Phân tích RSI ETH?)"></textarea>
+          <button class="btn btn-primary" id="btnChatSend">Gửi</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const balanceEl = document.getElementById('balance');
+    const balanceErrorEl = document.getElementById('balanceError');
+    const modeBadge = document.getElementById('modeBadge');
+    const runBadge = document.getElementById('runBadge');
+    const liveWarning = document.getElementById('liveWarning');
+    const coinSelector = document.getElementById('coinSelector');
+    const coinDropdown = document.getElementById('coinDropdown');
+    const coinIcon = document.getElementById('coinIcon');
+    const coinSymbol = document.getElementById('coinSymbol');
+    const coinIndicatorsCard = document.getElementById('coinIndicatorsCard');
+    const indicatorSymbol = document.getElementById('indicatorSymbol');
+    const indicatorSummary = document.getElementById('indicatorSummary');
+    const indicatorsPanel = document.getElementById('indicatorsPanel');
+    const inputMinConf = document.getElementById('inputMinConf');
+    const inputLeverage = document.getElementById('inputLeverage');
+    const inputSL = document.getElementById('inputSL');
+    const inputTP = document.getElementById('inputTP');
+    const inputMaxPos = document.getElementById('inputMaxPos');
+    const btnSaveConfig = document.getElementById('btnSaveConfig');
+    const btnAnalyze = document.getElementById('btnAnalyze');
+    const btnExecuteSelected = document.getElementById('btnExecuteSelected');
+    const btnExecuteAll = document.getElementById('btnExecuteAll');
+    const balanceMode = document.getElementById('balanceMode');
+    const inputLimitUsdt = document.getElementById('inputLimitUsdt');
+    const evidenceSection = document.getElementById('evidenceSection');
+    const evidenceList = document.getElementById('evidenceList');
+    const confirmEvidence = document.getElementById('confirmEvidence');
+    const btnExecuteAfterEvidence = document.getElementById('btnExecuteAfterEvidence');
+    const runMessage = document.getElementById('runMessage');
+    const signalsSection = document.getElementById('signalsSection');
+    const signalsBody = document.getElementById('signalsBody');
+    const executedSection = document.getElementById('executedSection');
+    const executedBody = document.getElementById('executedBody');
+    const executedPaperNote = document.getElementById('executedPaperNote');
+    const emptyState = document.getElementById('emptyState');
+    const logBox = document.getElementById('logBox');
+    const btnRefreshLog = document.getElementById('btnRefreshLog');
+    const openPositionsBody = document.getElementById('openPositionsBody');
+    const openPositionsEmpty = document.getElementById('openPositionsEmpty');
+    const positionHistoryList = document.getElementById('positionHistoryList');
+    const btnRefreshHistory = document.getElementById('btnRefreshHistory');
+    const chatMessages = document.getElementById('chatMessages');
+    const chatInput = document.getElementById('chatInput');
+    const btnChatSend = document.getElementById('btnChatSend');
+
+    let selectedSymbol = 'BTCUSDT';
+    let lastRunSignals = [];
+    const MIN_CONFIDENCE_THRESHOLD = 0.65;
+
+    function setRunning(running) {
+      runBadge.textContent = running ? 'Đang chạy...' : 'Idle';
+      runBadge.className = 'badge ' + (running ? 'badge-running' : 'badge-idle');
+      btnAnalyze.disabled = running;
+      btnExecuteSelected.disabled = running;
+      btnExecuteAll.disabled = running;
+    }
+
+    function getDemoBalance() {
+      const v = balanceMode.value;
+      if (v === 'mainnet' || v === 'testnet') return null;
+      if (v === 'demo_500') return 500;
+      if (v === 'demo_1000') return 1000;
+      if (v === 'demo_5000') return 5000;
+      return null;
+    }
+
+    function getBalanceModeParam() {
+      return balanceMode.value || 'mainnet';
+    }
+
+    function updateBalanceDisplay(apiBalance) {
+      const demo = getDemoBalance();
+      if (demo != null) {
+        balanceEl.innerHTML = '<strong>' + demo + '</strong> USDT <span style="color:var(--text-muted);font-size:0.8rem">(demo)</span>';
+        balanceErrorEl.style.display = 'none';
+      } else if (apiBalance != null) {
+        balanceEl.innerHTML = '<strong>' + apiBalance + '</strong> USDT';
+        balanceErrorEl.style.display = 'none';
+      }
+    }
+
+    async function fetchJSON(url, opts = {}) {
+      const r = await fetch(url, opts);
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(data.message || r.statusText);
+      return data;
+    }
+
+    async function loadStatus() {
+      try {
+        const balanceModeParam = getBalanceModeParam();
+        const s = await fetchJSON('/api/status?balance_mode=' + encodeURIComponent(balanceModeParam));
+        const demo = getDemoBalance();
+        if (demo != null) {
+          balanceEl.innerHTML = '<strong>' + demo + '</strong> USDT <span style="font-size:0.75rem;color:var(--warning)">(override size)</span>';
+          balanceErrorEl.style.display = 'none';
+        } else {
+          updateBalanceDisplay(s.balance_usdt);
+          const testnetLabel = (s.is_testnet ? ' <span style="font-size:0.75rem;color:var(--success)">(Testnet)</span>' : '');
+          if (s.balance_usdt != null && balanceEl.innerHTML) balanceEl.innerHTML = balanceEl.innerHTML.replace(' USDT', ' USDT' + testnetLabel);
+          if (s.balance_usdt == null) {
+            balanceEl.textContent = 'Không lấy được balance';
+            if (s.balance_error) {
+              const apiLink = (s.is_testnet ? '<a href="https://testnet.binancefuture.com/" target="_blank" rel="noopener">Lấy API key Testnet →</a>' : '<a href="https://www.binance.com/en/my/settings/api-management" target="_blank" rel="noopener">Cấu hình API →</a>');
+              balanceErrorEl.innerHTML = s.balance_error + ' ' + apiLink;
+              balanceErrorEl.style.display = 'block';
+            } else balanceErrorEl.style.display = 'none';
+          } else balanceErrorEl.style.display = 'none';
+        }
+        modeBadge.textContent = (s.trade_mode || 'paper').toUpperCase();
+        modeBadge.className = 'badge ' + (s.trade_mode === 'live' ? 'badge-live' : 'badge-paper');
+        if (s.is_testnet && s.trade_mode === 'live') modeBadge.title = 'Live gửi lệnh lên Testnet (không tốn tiền thật).';
+        liveWarning.style.display = (s.trade_mode === 'live' && !s.is_testnet) ? 'block' : 'none';
+        const testnetNote = document.getElementById('testnetSafeNote');
+        if (testnetNote) testnetNote.style.display = (s.trade_mode === 'live' && s.is_testnet) ? 'block' : 'none';
+        window.currentTradeMode = s.trade_mode || 'paper';
+        window.isTestnet = !!s.is_testnet;
+      } catch (e) {
+        balanceEl.textContent = 'Lỗi kết nối';
+        balanceErrorEl.style.display = 'none';
+      }
+    }
+    balanceMode.onchange = () => loadStatus();
+
+    async function loadWalletKeysStatus() {
+      try {
+        const w = await fetchJSON('/api/wallet-keys');
+        const mainnetEl = document.getElementById('mainnetKeyStatus');
+        const testnetEl = document.getElementById('testnetKeyStatus');
+        if (mainnetEl) mainnetEl.textContent = w.mainnet && w.mainnet.saved ? ('Đã lưu ' + (w.mainnet.key_masked || '')) : '';
+        if (testnetEl) testnetEl.textContent = w.testnet && w.testnet.saved ? ('Đã lưu ' + (w.testnet.key_masked || '')) : '';
+      } catch (_) {}
+    }
+
+    async function saveWalletKey(accountType) {
+      const keyId = accountType === 'mainnet' ? 'walletKeyMainnet' : 'walletKeyTestnet';
+      const secretId = accountType === 'mainnet' ? 'walletSecretMainnet' : 'walletSecretTestnet';
+      const apiKey = document.getElementById(keyId).value.trim();
+      const apiSecret = document.getElementById(secretId).value.trim();
+      if (!apiKey || !apiSecret) {
+        alert('Nhập đủ API Key và API Secret.');
+        return;
+      }
+      try {
+        const res = await fetchJSON('/api/wallet-keys', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ account_type: accountType, api_key: apiKey, api_secret: apiSecret }),
+        });
+        alert(res.message || 'Đã lưu.');
+        loadWalletKeysStatus();
+        loadStatus();
+      } catch (e) {
+        alert('Lỗi: ' + (e.message || e));
+      }
+    }
+
+    document.getElementById('btnSaveMainnet').onclick = () => saveWalletKey('mainnet');
+    document.getElementById('btnSaveTestnet').onclick = () => saveWalletKey('testnet');
+
+    async function loadConfig() {
+      try {
+        const c = await fetchJSON('/api/config');
+        inputMinConf.value = c.min_confidence != null ? Math.round(c.min_confidence * 100) : 65;
+        inputLeverage.value = c.default_leverage != null ? c.default_leverage : 5;
+        inputSL.value = c.stop_loss_percent != null ? (c.stop_loss_percent * 100) : 2;
+        inputTP.value = c.take_profit_percent != null ? (c.take_profit_percent * 100) : 4;
+        inputMaxPos.value = c.max_position_percent != null ? (c.max_position_percent * 100) : 5;
+        inputLimitUsdt.value = (c.limit_usdt_per_run != null && c.limit_usdt_per_run > 0) ? c.limit_usdt_per_run : 0;
+      } catch (_) {}
+    }
+
+    async function saveConfig() {
+      try {
+        const body = {
+          min_confidence: parseInt(inputMinConf.value, 10) / 100,
+          default_leverage: parseInt(inputLeverage.value, 10),
+          stop_loss_percent: parseFloat(inputSL.value) / 100,
+          take_profit_percent: parseFloat(inputTP.value) / 100,
+          max_position_percent: parseFloat(inputMaxPos.value) / 100,
+        };
+        const limitVal = parseFloat(inputLimitUsdt.value);
+        if (!isNaN(limitVal) && limitVal >= 0) body.limit_usdt_per_run = limitVal;
+        await fetchJSON('/api/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        alert('Đã lưu cấu hình.');
+      } catch (e) {
+        alert('Lỗi: ' + e.message);
+      }
+    }
+
+    function renderEvidence(signals) {
+      const highConf = signals.filter(s => s.confidence >= MIN_CONFIDENCE_THRESHOLD);
+      if (highConf.length === 0) {
+        evidenceSection.style.display = 'none';
+        return;
+      }
+      evidenceSection.style.display = 'block';
+      evidenceList.innerHTML = highConf.map(s => {
+        const ev = s.evidence || {};
+        const ind = ev.indicators || {};
+        const parts = [];
+        if (ind.rsi != null) parts.push('RSI: ' + ind.rsi.toFixed(1));
+        if (ind.ema_9 != null) parts.push('EMA9: ' + ind.ema_9.toFixed(2));
+        if (ind.close != null) parts.push('Giá: ' + ind.close);
+        const indStr = parts.length ? parts.join(' | ') : '--';
+        return '<div class="evidence-box"><h3>' + s.symbol + ' ' + s.direction + ' — ' + s.confidence_pct + '</h3><div class="evidence-item"><strong>Lý do:</strong> ' + (s.reason || '') + '</div><div class="evidence-item"><strong>Chỉ báo:</strong> ' + indStr + '</div><div class="evidence-item">' + (ev.chart_summary || '') + '</div></div>';
+      }).join('');
+      confirmEvidence.checked = false;
+      btnExecuteAfterEvidence.disabled = true;
+    }
+
+    function updateExecuteSelectedState() {
+      const checked = signalsBody.querySelectorAll('.signal-cb:checked');
+      btnExecuteSelected.disabled = checked.length === 0;
+    }
+
+    function getRunPayload(execute, symbols) {
+      const payload = { execute, symbols: symbols || undefined };
+      const limitVal = parseFloat(inputLimitUsdt.value);
+      if (!isNaN(limitVal) && limitVal > 0) payload.limit_usdt = limitVal;
+      const demo = getDemoBalance();
+      if (demo != null) payload.demo_balance = demo;
+      payload.balance_mode = getBalanceModeParam();
+      return payload;
+    }
+
+    confirmEvidence.onchange = () => { btnExecuteAfterEvidence.disabled = !confirmEvidence.checked; };
+
+    btnExecuteAfterEvidence.onclick = async () => {
+      if (!confirmEvidence.checked) return;
+      runMessage.innerHTML = '<div class="alert alert-info">Đang vào lệnh...</div>';
+      await fetchJSON('/api/run', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(getRunPayload(true)) });
+      setRunning(true);
+      pollRunStatus();
+    };
+
+    btnExecuteSelected.onclick = async () => {
+      const checked = signalsBody.querySelectorAll('.signal-cb:checked');
+      const symbols = Array.from(checked).map(el => el.dataset.symbol).filter(Boolean);
+      if (symbols.length === 0) return;
+      runMessage.innerHTML = '<div class="alert alert-info">Đang vào lệnh đã chọn...</div>';
+      await fetchJSON('/api/run', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(getRunPayload(true, symbols)) });
+      setRunning(true);
+      pollRunStatus();
+    };
+
+    btnExecuteAll.onclick = async () => {
+      runMessage.innerHTML = '<div class="alert alert-info">Đang vào lệnh tất cả (đạt ngưỡng)...</div>';
+      await fetchJSON('/api/run', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(getRunPayload(true)) });
+      setRunning(true);
+      pollRunStatus();
+    };
+
+    function renderRunResult(data) {
+      runMessage.innerHTML = '';
+      if (data.error) runMessage.innerHTML = '<div class="alert alert-error">' + data.error + '</div>';
+      if (data.finished_at) runMessage.innerHTML += '<div class="alert alert-info">Chu kỳ kết thúc lúc ' + new Date(data.finished_at).toLocaleString('vi') + '</div>';
+      const signals = (data.signals || []).slice().sort((a, b) => (b.confidence || 0) - (a.confidence || 0));
+      lastRunSignals = signals;
+      if (signals.length > 0) {
+        emptyState.style.display = 'none';
+        signalsSection.style.display = 'block';
+        signalsBody.innerHTML = signals.map(s => {
+          const passClass = (s.confidence >= MIN_CONFIDENCE_THRESHOLD) ? ' style="background: rgba(0,212,170,0.08)"' : '';
+          const canSelect = s.confidence >= MIN_CONFIDENCE_THRESHOLD;
+          const cb = canSelect ? '<input type="checkbox" class="signal-cb" data-symbol="' + s.symbol + '">' : '';
+          return '<tr' + passClass + '><td>' + cb + '</td><td>' + s.symbol + '</td><td class="' + (s.direction === 'LONG' ? 'dir-long' : 'dir-short') + '">' + s.direction + '</td><td class="conf">' + s.confidence_pct + '</td><td style="max-width:320px;font-size:0.85rem;color:var(--text-muted)">' + (s.reason || '').replace(/</g,'&lt;') + '</td></tr>';
+        }).join('');
+        signalsBody.querySelectorAll('.signal-cb').forEach(cb => cb.addEventListener('change', updateExecuteSelectedState));
+        updateExecuteSelectedState();
+        renderEvidence(signals);
+      } else {
+        signalsSection.style.display = 'none';
+        evidenceSection.style.display = 'none';
+        if (!data.error && data.status === 'idle') {
+          emptyState.style.display = 'block';
+          emptyState.innerHTML = data.finished_at
+            ? '<p>Đã chạy phân tích nhưng không có dữ liệu symbol (lỗi hoặc không kết nối được). Thử lại hoặc kiểm tra log.</p>'
+            : '<p>Chưa chạy chu kỳ. Bấm "Phân tích only" hoặc "Chạy 1 chu kỳ".</p>';
+        }
+      }
+      if (data.executed && data.executed.length > 0) {
+        executedSection.style.display = 'block';
+        const isPaper = (window.currentTradeMode || 'paper') === 'paper';
+        if (executedPaperNote) executedPaperNote.style.display = isPaper ? 'block' : 'none';
+        const statusText = (ok) => ok ? (isPaper ? '✓ Paper (giả lập)' : '✓ Đã gửi sàn') : '✗ Lỗi';
+        executedBody.innerHTML = data.executed.map(e => '<tr><td>' + e.symbol + '</td><td class="' + (e.direction === 'LONG' ? 'dir-long' : 'dir-short') + '">' + e.direction + '</td><td class="conf">' + e.confidence_pct + '</td><td>' + statusText(e.ok) + '</td></tr>').join('');
+      } else {
+        executedSection.style.display = 'none';
+        if (executedPaperNote) executedPaperNote.style.display = 'none';
+      }
+    }
+
+    async function pollRunStatus() {
+      const data = await fetchJSON('/api/run-status');
+      if (data.status === 'running') {
+        setRunning(true);
+        setTimeout(pollRunStatus, 1500);
+        return;
+      }
+      setRunning(false);
+      renderRunResult(data);
+    }
+
+    async function startRun(execute) {
+      runMessage.innerHTML = '<div class="alert alert-info">Đang chạy...</div>';
+      emptyState.style.display = 'none';
+      evidenceSection.style.display = 'none';
+      await fetchJSON('/api/run', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(getRunPayload(execute)) });
+      setRunning(true);
+      pollRunStatus();
+    }
+
+    btnAnalyze.onclick = () => startRun(false);
+    btnSaveConfig.onclick = saveConfig;
+    btnRefreshLog.onclick = loadLogs;
+
+    async function loadLogs() {
+      try {
+        const d = await fetchJSON('/api/logs?lines=80');
+        logBox.textContent = (d.lines || []).join('');
+        logBox.scrollTop = logBox.scrollHeight;
+      } catch (_) { logBox.textContent = 'Không tải được log.'; }
+    }
+
+    async function loadSymbols() {
+      try {
+        const d = await fetchJSON('/api/symbols');
+        const syms = d.symbols || [];
+        coinDropdown.innerHTML = syms.map(s => '<div class="coin-option" data-symbol="' + s + '"><span class="coin-icon" style="width:24px;height:24px;font-size:0.65rem">' + (s.replace('USDT','').slice(0,2)) + '</span>' + s + '</div>').join('');
+        coinDropdown.querySelectorAll('.coin-option').forEach(el => {
+          el.onclick = () => {
+            selectedSymbol = el.dataset.symbol;
+            coinSymbol.textContent = selectedSymbol;
+            coinIcon.textContent = selectedSymbol.replace('USDT','').slice(0,2);
+            coinDropdown.classList.remove('show');
+            loadIndicators(selectedSymbol);
+          };
+        });
+      } catch (_) {}
+    }
+
+    coinSelector.onclick = (e) => {
+      e.stopPropagation();
+      coinDropdown.classList.toggle('show');
+    };
+    document.addEventListener('click', () => coinDropdown.classList.remove('show'));
+
+    async function loadIndicators(symbol) {
+      try {
+        const d = await fetchJSON('/api/indicators?symbol=' + encodeURIComponent(symbol));
+        coinIndicatorsCard.style.display = 'block';
+        indicatorSymbol.textContent = d.symbol || symbol;
+        indicatorSummary.textContent = d.chart_summary || '';
+        const ind = d.indicators || {};
+        indicatorsPanel.innerHTML = Object.entries(ind).map(([k, v]) => '<span>' + k + ': ' + (v != null ? (typeof v === 'number' ? v.toFixed(4) : v) : '--') + '</span>').join('');
+      } catch (_) {
+        coinIndicatorsCard.style.display = 'block';
+        indicatorSummary.textContent = 'Không lấy được chỉ báo.';
+        indicatorsPanel.innerHTML = '';
+      }
+    }
+
+    async function loadPositionHistory() {
+      try {
+        const d = await fetchJSON('/api/position-history');
+        const items = d.items || [];
+        if (items.length === 0) {
+          positionHistoryList.innerHTML = '<div class="empty-state"><p>Chưa có lịch sử lãi/lỗ hoặc không lấy được từ API.</p></div>';
+          return;
+        }
+        positionHistoryList.innerHTML = items.map(p => {
+          const pnl = p.realized_pnl_usdt;
+          const pnlClass = pnl >= 0 ? 'pnl-pos' : 'pnl-neg';
+          const pnlStr = (pnl >= 0 ? '+' : '') + pnl + ' USDT';
+          return '<div class="position-card"><div class="position-card-header"><h4><span class="coin-icon">' + (p.symbol.replace('USDT','').slice(0,2)) + '</span> ' + p.symbol + ' — Vĩnh cửu</h4><span class="pnl ' + pnlClass + '">' + pnlStr + '</span></div><div class="meta"><span>Đã đóng</span><span>' + (p.time_str || '') + '</span></div></div>';
+        }).join('');
+      } catch (e) {
+        positionHistoryList.innerHTML = '<div class="empty-state"><p>Lỗi: ' + e.message + '</p></div>';
+      }
+    }
+    btnRefreshHistory.onclick = loadPositionHistory;
+
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.onclick = () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+        if (tab.dataset.tab === 'history') loadPositionHistory();
+      };
+    });
+
+    function addChatMsg(role, text) {
+      const div = document.createElement('div');
+      div.className = 'chat-msg ' + role;
+      div.innerHTML = '<div class="label">' + (role === 'user' ? 'Bạn' : 'AI') + '</div>' + text.replace(/\n/g, '<br>');
+      chatMessages.appendChild(div);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    btnChatSend.onclick = async () => {
+      const q = chatInput.value.trim();
+      if (!q) return;
+      addChatMsg('user', q);
+      chatInput.value = '';
+      try {
+        const d = await fetchJSON('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: q }) });
+        addChatMsg('bot', d.reply || 'Không có phản hồi.');
+      } catch (e) {
+        addChatMsg('bot', 'Lỗi: ' + e.message);
+      }
+    };
+
+    async function loadOpenPositions() {
+      try {
+        const balanceModeParam = getBalanceModeParam();
+        const d = await fetchJSON('/api/open-positions?balance_mode=' + encodeURIComponent(balanceModeParam));
+        const positions = d.positions || [];
+        const errMsg = d.error || '';
+        if (positions.length === 0) {
+          openPositionsBody.innerHTML = '';
+          openPositionsEmpty.style.display = 'block';
+          openPositionsEmpty.innerHTML = errMsg
+            ? '<p style="color:var(--danger)">' + errMsg.replace(/</g, '&lt;') + '</p><p style="margin-top:8px;font-size:0.85rem">Kiểm tra API key có bật Futures, quyền đọc.</p>'
+            : '<p>Không có vị thế đang mở.</p>';
+          return;
+        }
+        openPositionsEmpty.style.display = 'none';
+        openPositionsBody.innerHTML = positions.map(p => {
+          const pnlClass = p.unrealized_pnl >= 0 ? 'pnl-pos' : 'pnl-neg';
+          const pnlStr = (p.unrealized_pnl >= 0 ? '+' : '') + p.unrealized_pnl;
+          const roiClass = p.roi_pct >= 0 ? 'pnl-pos' : 'pnl-neg';
+          const roiStr = (p.roi_pct >= 0 ? '+' : '') + p.roi_pct + '%';
+          return '<tr><td>' + p.symbol + '</td><td class="' + (p.side === 'LONG' ? 'dir-long' : 'dir-short') + '">' + p.side + '</td><td class="conf">' + p.entry_price + '</td><td class="conf">' + p.mark_price + '</td><td class="' + pnlClass + '">' + pnlStr + '</td><td class="' + roiClass + '">' + roiStr + '</td><td>' + p.leverage + 'x</td></tr>';
+        }).join('');
+      } catch (e) {
+        openPositionsBody.innerHTML = '';
+        openPositionsEmpty.style.display = 'block';
+        openPositionsEmpty.innerHTML = '<p style="color:var(--danger)">Không kết nối được API.</p><p style="margin-top:4px;font-size:0.85rem">' + (e.message || '').replace(/</g, '&lt;') + '</p>';
+      }
+    }
+
+    loadStatus();
+    loadConfig();
+    loadWalletKeysStatus();
+    loadSymbols();
+    loadLogs();
+    loadIndicators(selectedSymbol);
+    loadOpenPositions();
+    fetchJSON('/api/run-status').then(renderRunResult).catch(() => {});
+    setInterval(loadStatus, 30000);
+    setInterval(loadOpenPositions, 2000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+# Never commit secrets (API keys, etc.)
+.env
+.env.local
+.env.*.local
+data/wallet_keys.json
+data/last_run.json
+venv/
+__pycache__/
+*.pyc
+logs/
+*.log
+.idea/
+.vscode/
